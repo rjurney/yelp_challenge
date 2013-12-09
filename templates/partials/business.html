@@ -1,0 +1,29 @@
+<!-- Extend our site layout -->
+{% extends "layout.html" %}
+
+<!-- Include our common macro set -->
+{% import "macros.jnj" as common %}
+
+<!-- Parse a pig tuple being passed through in string format -->
+
+{% block content -%}
+  <p class="lead">Yelp Business</p>
+  <div>
+    <table class="table table-striped table-condensed">
+      <thead>
+        <th>Business ID</th>
+        <th>Name</th>
+        <th>Full Address</th>
+        <th>Open Status</th>
+        <th>Categories</th>
+      </thead>
+      <tbody>
+          <td>{{ business['business_id'] }}</td>
+          <td>{{ business['name'] }}</td>
+          <td>{{ business['full_address'] }}</td>
+          <td>{{ business['open'] }}</td>
+          <td>{% for category in business['categories'] -%}<div>{{ category }}</div>{% endfor -%}</td>
+      </tbody>
+    </table>
+  </div>
+{% endblock -%}
