@@ -26,4 +26,11 @@
       </tbody>
     </table>
   </div>
+  <div>
+    <table class="table table-striped table-condensed">
+      {% for hour in hours -%}
+        <tr><td>{{ hour }}</td><td>{{ hours[hour] }}</td></tr>
+      {% endfor -%}
+    </table>
+  </div>
 {% endblock -%}
