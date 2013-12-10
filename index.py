@@ -18,7 +18,7 @@ checkins = db['checkins']
 def init_hash():
     h = {}
     for i in range(0,23):
-        h[str(i)] = 0
+        h[i] = 0
     return h
 
 def process_hours(hours_days):
@@ -26,7 +26,7 @@ def process_hours(hours_days):
     for hour_day in hours_days:
         hour, day = parse_hour(hour_day)
         print hours_days[hour_day]
-        hour_chart_data[str(hour)] += hours_days[hour_day]
+        hour_chart_data[int(hour)] += hours_days[hour_day]
     return hour_chart_data
 
 def parse_hour(hour_day):
