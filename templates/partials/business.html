@@ -26,11 +26,33 @@
       </tbody>
     </table>
   </div>
-  <div>
-    <table class="table table-striped table-condensed">
-      {% for hour in hours -%}
-        <tr><td>{{ hour }}</td><td>{{ hours[hour] }}</td></tr>
-      {% endfor -%}
-    </table>
+  <p class="lead">Checkin Hours</p>
+  <div class="row">
+    <div class="span4">
+      <div id="chart">
+          <svg style='height:400px; width: 800px;'> </svg>
+      </div>
+      <script>
+      nv.addGraph(function() {
+        var chart = nv.models.discreteBarChart()
+          .x(function(d) { return d.label })
+          .y(function(d) { return d.value })
+          .staggerLabels(false)
+          .tooltips(false)
+          .showValues(false)
+        .color(function(x) {'blue'})
+
+      d3.select('#chart svg')
+        .datum({{ hours_json | safe }})
+        .transition().duration(500)
+        .call(chart);
+
+      nv.utils.windowResize(chart.update);
+
+          return chart;
+});
+        </script>
+    </div>
   </div>
+
 {% endblock -%}
