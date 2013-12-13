@@ -39,7 +39,17 @@ def business(business_id):
   checks = checkins.find_one({'business_id': business_id})
   hours = process_hours(checks['checkin_info'])
   hours_json = json.dumps([{'key': 'Checkins Per Hour', 'values': hours}])
+  revs = reviews.find({'business_id': business_id}).sort('date', pymongo.DESCENDING)
   return render_template('partials/business.html', business=business, hours_json=hours_json, hours=hours)
+
+# Controller: Fetch a review and display it
+@app.route("/review/<review_id>")
+def review(review_id):
+    review = reviews.find_one({'review_id': review_id})
+    business = businesses.find_one({'business_id': review['business_id']})
+    user = users.find_one({'user_id': review['user_id']})
+    print "Review: " + str(review)
+    return render_template('partials/review.html', review=review, business=business, user=user)
 
 if __name__ == "__main__":
   app.run(debug=True)
