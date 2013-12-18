@@ -46,13 +46,15 @@ sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
 
 for line in lines:
     review = json.loads(line)
-    sentences = sent_detector.tokenize(review['text'])
-    words = nltk.word_tokenize(sentences[0])
-    tagged = brill_tagger.tag(words)
     adjectives = []
-    for tag in tagged:
-        if tag[1].startswith('JJ'):
-            adjectives.append(tag[0].lower())
+    sentences = sent_detector.tokenize(review['text'])
+    for sentence in sentences:
+        words = nltk.word_tokenize(sentence)
+        tagged = brill_tagger.tag(words)
+    
+        for tag in tagged:
+            if tag[1].startswith('JJ') | tag[1].startswith('RB'): # Adjectives or adverbs
+                adjectives.append(tag[0].lower())
     if adjectives:
         try:
             print review['business_id'] + "\t" + " ".join(adjectives)

@@ -2,11 +2,64 @@ from math import radians, cos, sin, asin, sqrt
 from pig_util import outputSchema
 import nltk
 
-from nltk.stem.wordnet import WordNetLemmatizer
-lmtzr = WordNetLemmatizer()
+import nltk, json
+from nltk.tag.brill import *
 
-from nltk.corpus import stopwords
-stopwords = stopwords.words('english')
+from nltk.corpus import brown
+brown_train = list(brown.tagged_sents(categories='news'))
+from nltk.corpus import treebank
+treebank_train = list(treebank.tagged_sents())
+training_data = brown_train + treebank_train
+
+from nltk.tag.sequential import RegexpTagger
+regexp_tagger = RegexpTagger(
+     [(r'^-?[0-9]+(.[0-9]+)?$', 'CD'),   # cardinal numbers
+      (r'(The|the|A|a|An|an)$', 'AT'),   # articles
+      (r'.*able$', 'JJ'),                # adjectives
+      (r'.*ness$', 'NN'),                # nouns formed from adjectives
+      (r'.*ly$', 'RB'),                  # adverbs
+      (r'.*s$', 'NNS'),                  # plural nouns
+      (r'.*ing$', 'VBG'),                # gerunds
+      (r'.*ed$', 'VBD'),                 # past tense verbs
+      (r'.*', 'NN')                      # nouns (default)
+])
+
+unigram_tagger_2 = nltk.UnigramTagger(brown_train, backoff=regexp_tagger)
+templates = [
+     SymmetricProximateTokensTemplate(ProximateTagsRule, (1,1)),
+     SymmetricProximateTokensTemplate(ProximateTagsRule, (2,2)),
+     SymmetricProximateTokensTemplate(ProximateTagsRule, (1,2)),
+     SymmetricProximateTokensTemplate(ProximateTagsRule, (1,3)),
+     SymmetricProximateTokensTemplate(ProximateWordsRule, (1,1)),
+     SymmetricProximateTokensTemplate(ProximateWordsRule, (2,2)),
+     SymmetricProximateTokensTemplate(ProximateWordsRule, (1,2)),
+     SymmetricProximateTokensTemplate(ProximateWordsRule, (1,3)),
+     ProximateTokensTemplate(ProximateTagsRule, (-1, -1), (1,1)),
+     ProximateTokensTemplate(ProximateWordsRule, (-1, -1), (1,1)),
+     ]
+trainer = FastBrillTaggerTrainer(initial_tagger=unigram_tagger_2,
+                                  templates=templates, trace=3,
+                                  deterministic=True)
+brill_tagger = trainer.train(training_data, max_rules=10)
+
+@outputSchema("tokens:chararray")
+def adjectives(paragraph):
+    adjectives = []
+    
+    sentences = nltk.sent_tokenize(paragraph)
+    for sentence in sentences:
+        words = nltk.word_tokenize(sentence)
+        tagged = brill_tagger.tag(words)
+        for tag in tagged:
+            if tag[1].startswith('JJ'):# | tag[1].startswith('RB'): # Adjectives or adverbs
+                adjectives.append(tag[0].lower())
+    print " ".join(adjectives)
+    # if adjectives:
+    #     try:
+    #         print " ".join(adjectives)
+    #     except UnicodeEncodeError:
+    #         print "ERROR"
+    #         pass
 
 @outputSchema("distance:double")
 def haversine(lon1, lat1, lon2, lat2):
@@ -23,30 +76,3 @@ def haversine(lon1, lat1, lon2, lat2):
     c = 2 * asin(sqrt(a))
     km = 6367 * c
     return km
-
-@outputSchema("phrases:bag{t:tuple(phrase:chararray)}")
-def noun_phrases(paragraph):
-    grammar = r"""
-        NBAR:
-            {<NN.*|JJ>*<NN.*>}  # Nouns and Adjectives, terminated with Nouns
-
-        NP:
-            {<NBAR>}
-            {<NBAR><IN><NBAR>}  # Above, connected with in/of/etc...
-    """
-    chunker = nltk.RegexpParser(grammar)
-    sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
-    sentences = sent_detector.tokenize(paragraph.strip())
-    words = []
-    for sentence in sentences:
-        tokens = nltk.word_tokenize(sentence)
-        tagged = nltk.pos_tag(tokens)
-        tree = chunker.parse(tagged)
-        for subtree in tree.subtrees(filter=lambda t: t.node == 'NP'):
-            # print the noun phrase as a list of part-of-speech tagged words
-            for word in subtree.leaves():
-                word = lmtzr.lemmatize(word[0])
-                word = word.lower()
-                words.append(word)
-    words = [word for word in words if len(word) > 3]
-    return words
