@@ -5,6 +5,5 @@ rmf /tmp/adjectives.tsv
 set default_parallel 20
 
 reviews = LOAD '/tmp/reviews.avro' USING AvroStorage();
-reviews = LIMIT reviews 100;
 nouns = FOREACH reviews GENERATE business_id, udfs.adjectives(text) AS adjectives;
 STORE nouns into '/tmp/adjectives.tsv';

@@ -45,21 +45,20 @@ brill_tagger = trainer.train(training_data, max_rules=10)
 @outputSchema("tokens:chararray")
 def adjectives(paragraph):
     adjectives = []
-    
     sentences = nltk.sent_tokenize(paragraph)
+    print sentences
     for sentence in sentences:
         words = nltk.word_tokenize(sentence)
         tagged = brill_tagger.tag(words)
         for tag in tagged:
             if tag[1].startswith('JJ'):# | tag[1].startswith('RB'): # Adjectives or adverbs
                 adjectives.append(tag[0].lower())
-    print " ".join(adjectives)
-    # if adjectives:
-    #     try:
-    #         print " ".join(adjectives)
-    #     except UnicodeEncodeError:
-    #         print "ERROR"
-    #         pass
+    if adjectives:
+        try:
+            return " ".join(adjectives)
+        except UnicodeEncodeError:
+            return "ERROR"
+            pass
 
 @outputSchema("distance:double")
 def haversine(lon1, lat1, lon2, lat2):
@@ -76,3 +75,12 @@ def haversine(lon1, lat1, lon2, lat2):
     c = 2 * asin(sqrt(a))
     km = 6367 * c
     return km
+
+@outputSchema("word:chararray")
+def stop_word(word):
+    
+    if word in stopwords:
+        pass
+    else
+        return word
+
