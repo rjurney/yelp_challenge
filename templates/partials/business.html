@@ -74,9 +74,9 @@
     </div>
   </div>
   <div class="row" style="margin-top: 20px;">
-    <p class="lead">Reviews</p>
     <div class="col-md-4">
-      <table class="table table-striped table-condensed" style="width: 600px;">
+      <p class="lead">Reviews</p>
+      <table class="table table-striped table-condensed">
         <thead>
           <th>Name</th>
           <th>Stars</th>
@@ -87,7 +87,7 @@
           <tr style="white-space:nowrap;">
             <td>{{ r['review_id'] }}</td>
             <td>{{ r['stars'] }}</td>
-            <td style="white-space:nowrap;">{{ r['text'] }}</td>
+            <td style="white-space:nowrap;">{{ common.limit_length(r['text'], 140) }}</td>
           </tr>
           {% endfor %}
         </tbody>
