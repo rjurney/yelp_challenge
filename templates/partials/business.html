@@ -43,6 +43,9 @@
             }).addTo(map);
             var marker = L.marker([{{ business['latitude'] }}, {{ business['longitude'] }}]).addTo(map);
             marker.bindPopup("{{ business['name'] }}").openPopup();
+            {% for b in biz -%}
+              var marker = L.marker([{{ b['latitude'] }}, {{ b['longitude'] }}]).addTo(map);
+            {% endfor -%}
     </script>
   </div>
   <div class="row">

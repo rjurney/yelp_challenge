@@ -4,7 +4,7 @@ REGISTER /me/Software/mongo-hadoop/core/target/mongo-hadoop-core-1.1.0-SNAPSHOT.
 REGISTER /me/Software/mongo-hadoop/pig/target/mongo-hadoop-pig-1.1.0-SNAPSHOT.jar
 DEFINE MongoStorage com.mongodb.hadoop.pig.MongoStorage();
 
-rmf /tmp/nearest_businesses.avro
+rmf /tmp/with_coords.json
 
 raw_distances = LOAD 'yelp_phoenix_academic_dataset/distances.tsv' AS (business_1:chararray, business_2:chararray, distance:double);
 businesses = LOAD '/tmp/businesses.avro' USING AvroStorage();
@@ -31,7 +31,7 @@ with_coords = FOREACH with_coords GENERATE $0#'raw_distances::business_2' AS bus
 nearest_businesses = FOREACH (GROUP with_coords BY business_1) {
     sorted = ORDER with_coords BY distance;
     top_10 = LIMIT sorted 10;
-    GENERATE group as business_id, top_10.(business_2, latitude, longitude) AS nearest_businesses;
+    GENERATE group as business_id, top_10.(business_2, name, latitude, longitude) AS nearest_businesses;
 }
-STORE nearest_businesses INTO '/tmp/nearest_businesses.avro' USING AvroStorage();
-STORE nearest_businesses INTO 'mongodb://localhost/yelp.nearest_businesses' USING MongoStorage();
+-- STORE nearest_businesses INTO '/tmp/nearest_businesses.json' USING JsonStorage();
+STORE nearest_businesses INTO 'mongodb://localhost/yelp.nearest_businesses_2' USING MongoStorage();

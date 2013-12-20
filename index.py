@@ -14,6 +14,7 @@ businesses = db['businesses']
 users = db['users']
 reviews = db['reviews']
 checkins = db['checkins']
+nearest_businesses = db['nearest_businesses']
 
 def init_zero_hash():
     h = []
@@ -43,7 +44,11 @@ def business(business_id):
     hours = None
   hours_json = json.dumps([{'key': 'Checkins Per Hour', 'values': hours}])
   revs = reviews.find({'business_id': business_id}).sort('date', pymongo.DESCENDING)
-  return render_template('partials/business.html', business=business, hours_json=hours_json, hours=hours, revs=revs)
+  nearby = nearest_businesses.find_one({'business_id': business_id})
+  biz = []
+  for biz_id in nearby['nearest_businesses']:
+      biz.append(businesses.find_one({'business_id': biz_id['business_2']}))
+  return render_template('partials/business.html', business=business, hours_json=hours_json, hours=hours, revs=revs, biz=biz)
 
 # Controller: Fetch a review and display it
 @app.route("/review/<review_id>")
