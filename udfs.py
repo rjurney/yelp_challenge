@@ -75,12 +75,3 @@ def haversine(lon1, lat1, lon2, lat2):
     c = 2 * asin(sqrt(a))
     km = 6367 * c
     return km
-
-@outputSchema("word:chararray")
-def stop_word(word):
-    
-    if word in stopwords:
-        pass
-    else
-        return word
-
