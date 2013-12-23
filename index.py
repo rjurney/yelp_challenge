@@ -37,7 +37,7 @@ def map_degree_to_zoom(degree_value):
     range_min = 0
     range_max = 142
     zoom_min = 7
-    zoom_max = 16
+    zoom_max = 12
     
     # Compute ranges
     range_span = range_max - range_min
@@ -47,7 +47,11 @@ def map_degree_to_zoom(degree_value):
     value_scaled = float(degree_value - range_min) / float(range_span)
     
     # Convert the 0-1 range into a value in the right range.
-    return int(zoom_max - (value_scaled * zoom_span)) - 1
+    return int(zoom_max - (value_scaled * zoom_span))
+    
+# [{'value': 0, 'label': '0'}, {'value': 0, 'label': '1'}
+def to_hours_array(records):
+    return json.dumps([r['value'] for r in records])
 
 # Controller: Fetch a business and display it
 @app.route("/business/<business_id>")
