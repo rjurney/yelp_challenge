@@ -35,7 +35,8 @@ with_coords = FOREACH with_coords GENERATE $0#'raw_distances::business_2' AS bus
 nearest_businesses = FOREACH (GROUP with_coords BY business_1) {
     sorted = ORDER with_coords BY distance;
     top_10 = LIMIT sorted 10;
-    GENERATE group as business_id, top_10.(business_2, name, latitude, longitude) AS nearest_businesses;
+    GENERATE group AS business_id, 
+             (float)MAX(top_10.distance) AS range:float, 
+             top_10.(business_2, name, latitude, longitude) AS nearest_businesses;
 }
--- STORE nearest_businesses INTO '/tmp/nearest_businesses.json' USING JsonStorage();
 STORE nearest_businesses INTO 'mongodb://localhost/yelp.nearest_businesses' USING MongoStorage();
