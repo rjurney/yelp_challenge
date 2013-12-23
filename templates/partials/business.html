@@ -48,7 +48,7 @@
                 }
             }); /***  end of hack ***/
     
-            var map = L.map('map').setView([{{ business['latitude'] }}, {{ business['longitude'] }}], 17);
+            var map = L.map('map').setView([{{ business['latitude'] }}, {{ business['longitude'] }}], {{ zoom_level }});
             L.tileLayer('http://{s}.tile.cloudmade.com/03ab408055d8425eb5161bf48fbb7435/997/256/{z}/{x}/{y}.png', {
                 attribution: '',
                 maxZoom: 18
@@ -58,7 +58,7 @@
             marker.bindPopup("<a href='/business/{{ business['business_id'] }}'><b>{{ business['name'] }}</b></a>").openPopup();
             {% for b in nearby -%}
               var marker = L.marker([{{ b['latitude'] }}, {{ b['longitude'] }}]).addTo(map);
-              marker.bindPopup("<a href='/business/{{ b[\'business_id\'] }}>{{ b['name'] }}</a>");
+              marker.bindPopup("<a href='/business/{{ b['business_2'] }}'>{{ b['name'] }}</a>");
             {% endfor -%}
     </script>
   </div>

@@ -32,6 +32,23 @@ def process_hours(hours_days):
         hour_chart_data[int(hour)]['value'] += hours_days[hour_day]
     return hour_chart_data
 
+def map_degree_to_zoom(degree_value):
+    # Determined by experimentation with Leaflet UI and MAX() of distances in Pig
+    range_min = 0
+    range_max = 142
+    zoom_min = 7
+    zoom_max = 16
+    
+    # Compute ranges
+    range_span = range_max - range_min
+    zoom_span = zoom_max - zoom_min
+    
+    # Convert the left range into a 0-1 range (float)
+    value_scaled = float(degree_value - range_min) / float(range_span)
+    
+    # Convert the 0-1 range into a value in the right range.
+    return int(zoom_max - (value_scaled * zoom_span)) - 1
+
 # Controller: Fetch a business and display it
 @app.route("/business/<business_id>")
 def business(business_id):
@@ -44,8 +61,14 @@ def business(business_id):
     hours = None
   hours_json = json.dumps([{'key': 'Checkins Per Hour', 'values': hours}])
   revs = reviews.find({'business_id': business_id}).sort('date', pymongo.DESCENDING)
-  nearby = nearest_businesses.find_one({'business_id': business_id})['nearest_businesses']
-  return render_template('partials/business.html', business=business, hours_json=hours_json, hours=hours, revs=revs, nearby=nearby)
+  nearby = nearest_businesses.find_one({'business_id': business_id})
+  zoom_level = map_degree_to_zoom(nearby['range'])
+  return render_template('partials/business.html', business=business, 
+                                                   hours_json=hours_json, 
+                                                   hours=hours, 
+                                                   revs=revs, 
+                                                   nearby=nearby['nearest_businesses'], 
+                                                   zoom_level=zoom_level)
 
 # Controller: Fetch a review and display it
 @app.route("/review/<review_id>")
