@@ -51,7 +51,8 @@ def adjectives(paragraph):
         words = nltk.word_tokenize(sentence)
         tagged = brill_tagger.tag(words)
         for tag in tagged:
-            if tag[1].startswith('JJ'):# | tag[1].startswith('RB'): # Adjectives or adverbs
+            # Adjectives, adverbs and nouns longer than 3 chars
+            if ( tag[1].startswith('JJ') | tag[1].startswith('RB') | tag[1].startswith('NN') ) & (len(tag[0]) > 3):
                 adjectives.append(tag[0].lower())
     if adjectives:
         try:

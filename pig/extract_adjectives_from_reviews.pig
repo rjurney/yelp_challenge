@@ -1,9 +1,12 @@
 REGISTER 'udfs.py' USING streaming_python AS udfs;
 
 rmf /tmp/adjectives.tsv
-
-set default_parallel 20
+SET default_parallel 10
 
 reviews = LOAD '/tmp/reviews.avro' USING AvroStorage();
-nouns = FOREACH reviews GENERATE business_id, udfs.adjectives(text) AS adjectives;
-STORE nouns into '/tmp/adjectives.tsv';
+reviews = FOREACH reviews GENERATE business_id, text;
+businesses = LOAD '/tmp/businesses.avro' USING AvroStorage();
+businesses = FOREACH businesses GENERATE business_id, name;
+joined = JOIN reviews BY business_id, businesses BY business_id USING 'replicated';
+words = FOREACH joined GENERATE businesses::business_id, name, udfs.adjectives(text) AS tokens;
+STORE words INTO '/tmp/adjectives.tsv';
