@@ -68,7 +68,15 @@
       <div id="chart">
           <svg style='height:320px; '> </svg>
       </div>
+      <style>
+      .line {
+        fill: none;
+        stroke: #000;
+        stroke-width: 1.5px;
+      }
+      </style>
       <script>
+  
       nv.addGraph(function() {
         var chart = nv.models.discreteBarChart()
           .x(function(d) { return d.label })
@@ -77,14 +85,15 @@
           .tooltips(false)
           .showValues(false)
         .color(function(x) {'blue'})
+        
+      var data = {{ hours_json | safe }};
 
-      d3.select('#chart svg')
-        .datum({{ hours_json | safe }})
-        .transition().duration(500)
-        .call(chart);
-
+      var svg = d3.select('#chart svg');
+      svg.datum(data)
+         .transition().duration(500)
+         .call(chart);
+        
       nv.utils.windowResize(chart.update);
-
       return chart;
 });
         </script>
@@ -102,7 +111,7 @@
         <tbody>
           {% for r in revs %}
           <tr style="white-space:nowrap;">
-            <td>{{ r['review_id'] }}</td>
+            <td><a href="/review/{{ r['review_id'] }}">{{ r['review_id'] }}</a></td>
             <td>{{ r['stars'] }}</td>
             <td style="white-space:nowrap;">{{ common.limit_length(r['text'], 140) }}</td>
           </tr>
