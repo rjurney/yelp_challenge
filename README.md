@@ -4,7 +4,9 @@ This repository contains experiments with the Yelp Data Challenge dataset. See [
 
 ## Data Flows
 
+### Natural Language Processing
 
+### Location/Mapping
 
 ## Booting the Web Application for Python Beginners
 
@@ -14,7 +16,7 @@ python ez_setup.py
 easy_install pip
 pip install --upgrade setuptools
 pip install virtualenv
-virtualenv `which python`
-source bin/activate
+virtualenv -p `which python` env
+source env/bin/activate
 pip install -r requirements.txt
 python index.py
