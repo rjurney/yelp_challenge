@@ -4,7 +4,17 @@ This repository contains experiments with the Yelp Data Challenge dataset. See [
 
 ## Data Flows
 
-### Json to CSV
 
-The file json_to_csv.pig converts the JSON business records to CSV for exploratory data analysis in Gephi and Pandas.
 
+## Booting the Web Application for Python Beginners
+
+cd web
+wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
+python ez_setup.py
+easy_install pip
+pip install --upgrade setuptools
+pip install virtualenv
+virtualenv `which python`
+source bin/activate
+pip install -r requirements.txt
+python index.py
