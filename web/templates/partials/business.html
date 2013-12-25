@@ -63,14 +63,14 @@
     </script>
   </div>
   <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-12">
       <script src="/static/d3.layout.cloud.js"></script>
       <script>
         var fill = d3.scale.category20();
         function draw(words) {
           d3.select("body").append("svg")
-              .attr("width", 300)
-              .attr("height", 300)
+              .attr("width", 1200)
+              .attr("height", 600)
             .append("g")
               .attr("transform", "translate(150,150)")
             .selectAll("text")
@@ -86,11 +86,9 @@
               .text(function(d) { return d.text; });
         }
         
-        d3.layout.cloud().size([300, 300])
-            .words([
-              "Hello", "world", "normally", "you", "want", "more", "words",
-              "than", "this"].map(function(d) {
-              return {text: d, size: 10 + Math.random() * 90};
+        d3.layout.cloud().size([1200, 600])
+            .words({{ words_per_business | safe }}.map(function(d) {
+              return {text: d['adjective'], size: 10 + d['score'] * 100000};
             }))
             .padding(5)
             .rotate(function() { return ~~(Math.random() * 2) * 90; })
