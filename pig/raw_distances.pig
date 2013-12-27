@@ -5,10 +5,10 @@ SET elephantbird.jsonloader.nestedLoad 'true'
 REGISTER 'udfs.py' using streaming_python AS udfs;
 SET default_parallel 10
 
-rmf yelp_phoenix_academic_dataset/locations.tsv
-rmf yelp_phoenix_academic_dataset/distances.tsv
+rmf ../yelp_phoenix_academic_dataset/locations.tsv
+rmf ../yelp_phoenix_academic_dataset/distances.tsv
 
-businesses = LOAD 'yelp_phoenix_academic_dataset/yelp_academic_dataset_business.json' using com.twitter.elephantbird.pig.load.JsonLoader() as json:map[];
+businesses = LOAD '../yelp_phoenix_academic_dataset/yelp_academic_dataset_business.json' using com.twitter.elephantbird.pig.load.JsonLoader() as json:map[];
 
 /* {open=true, neighborhoods={}, review_count=14, stars=4.0, name=Drybar, business_id=LcAamvosJu0bcPgEVF-9sQ, state=AZ, full_address=3172 E Camelback Rd
 Phoenix, AZ85018, categories={(Hair Salons),(Hair Stylists),(Beauty & Spas)}, longitude=-112.0131927, latitude=33.5107772, type=business, city=Phoenix} */
@@ -21,10 +21,10 @@ flat_locations = FOREACH raw_locations GENERATE business_id,
                                                 latitude, 
                                                 FLATTEN(categories) AS category;
 
-STORE flat_locations INTO 'yelp_phoenix_academic_dataset/locations.tsv';
+STORE flat_locations INTO '../yelp_phoenix_academic_dataset/locations.tsv';
 
 locations = flat_locations;
-locations_2 = LOAD 'yelp_phoenix_academic_dataset/locations.tsv' AS (business_id:chararray, longitude:float, latitude:float, category:chararray);
+locations_2 = LOAD '../yelp_phoenix_academic_dataset/locations.tsv' AS (business_id:chararray, longitude:float, latitude:float, category:chararray);
 
 location_comparisons = JOIN locations BY category, locations_2 BY category USING 'replicated';                                                        
 distances = FOREACH location_comparisons GENERATE flat_locations::business_id AS business_id_1,

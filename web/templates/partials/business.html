@@ -29,7 +29,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-md-4">
+    <div id="map"class="col-md-4">
     <p class="lead">Map</p>
     <div id="map"></div>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.js"></script>
@@ -63,45 +63,10 @@
     </script>
   </div>
   <div class="row">
-    <div class="col-md-12">
-      <script src="/static/d3.layout.cloud.js"></script>
-      <script>
-        var fill = d3.scale.category20();
-        function draw(words) {
-          d3.select("body").append("svg")
-              .attr("width", 1200)
-              .attr("height", 600)
-            .append("g")
-              .attr("transform", "translate(150,150)")
-            .selectAll("text")
-              .data(words)
-            .enter().append("text")
-              .style("font-size", function(d) { return d.size + "px"; })
-              .style("font-family", "Impact")
-              .style("fill", function(d, i) { return fill(i); })
-              .attr("text-anchor", "middle")
-              .attr("transform", function(d) {
-                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
-              })
-              .text(function(d) { return d.text; });
-        }
-        
-        d3.layout.cloud().size([1200, 600])
-            .words({{ words_per_business | safe }}.map(function(d) {
-              return {text: d['adjective'], size: 10 + d['score'] * 100000};
-            }))
-            .padding(5)
-            .rotate(function() { return ~~(Math.random() * 2) * 90; })
-            .font("Impact")
-            .fontSize(function(d) { return d.size; })
-            .on("end", draw)
-            .start();
-      </script>
-    </div>
     <div class="col-md-4">
       <p class="lead">Checkin Hours</p>
       <div id="chart">
-          <svg style='height:320px; '> </svg>
+          <svg style='height:320px; width: 320px;'> </svg>
       </div>
       <style>
       .line {
@@ -133,6 +98,41 @@
 });
         </script>
     </div>
+    <div class="col-md-4" id="chart">
+      <script src="/static/d3.layout.cloud.js"></script>
+      <script>
+        var fill = d3.scale.category20();
+        function draw(words) {
+          d3.select("#chart").append("svg")
+              .attr("width", 1200)
+              .attr("height", 1000)
+            .append("g")
+              .attr("transform", "translate(150,150)")
+            .selectAll("text")
+              .data(words)
+            .enter().append("text")
+              .style("font-size", function(d) { return d.size + "px"; })
+              .style("font-family", "Impact")
+              .style("fill", function(d, i) { return fill(i); })
+              .attr("text-anchor", "middle")
+              .attr("transform", function(d) {
+                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+              })
+              .text(function(d) { return d.text; });
+        }
+
+        d3.layout.cloud().size([1200, 600])
+            .words({{ words_per_business | safe }}.map(function(d) {
+              return {text: d['adjective'], size: 10 + d['score'] * 10000};
+            }))
+            .padding(2)
+            .rotate(function() { return ~~(Math.random() * 2) * 90; })
+            .font("Helvetica")
+            .fontSize(function(d) { return d.size; })
+            .on("end", draw)
+            .start();
+      </script>
+    </div>
   </div>
   <div class="row" style="margin-top: 20px;">
     <div class="col-md-4">
@@ -155,5 +155,6 @@
       </table> 
     </div>
   </div>
+
 
 {% endblock -%}

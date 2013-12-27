@@ -67,9 +67,12 @@ def business(business_id):
   revs = reviews.find({'business_id': business_id}).sort('date', pymongo.DESCENDING)
   nearby = nearest_businesses.find_one({'business_id': business_id})
   zoom_level = map_degree_to_zoom(nearby['range'])
+  zoom_level = 11
   words_per_business = db['ntf_idf_words_per_business'].find_one({'business_id': business_id})
   if words_per_business:
     words_per_business = json.dumps(words_per_business['ntf_idf_scores'])
+  print "Range: %s" % (nearby['range'])
+  print "Zoom level: %s" % (zoom_level)
   return render_template('partials/business.html', business=business, 
                                                    hours_json=hours_json, 
                                                    hours=hours, 

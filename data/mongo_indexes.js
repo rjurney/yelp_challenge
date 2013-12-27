@@ -5,3 +5,4 @@ db.reviews.ensureIndex({'review_id': 1});
 db.reviews.ensureIndex({'business_id': 1});
 db.ntf_idf_words_per_business.ensureIndex({'business_id': 1});
 db.raw_words_per_business.ensureIndex({'business_id': 1});
+db.nearest_businesses.ensureIndex({'range': 1});

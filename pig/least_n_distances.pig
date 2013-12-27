@@ -25,7 +25,7 @@ STORE with_coords INTO '/tmp/with_coords.json' USING JsonStorage();
 
 with_coords = LOAD '/tmp/with_coords.json' using com.twitter.elephantbird.pig.load.JsonLoader() as json:map[];
 with_coords = FOREACH with_coords GENERATE $0#'raw_distances::business_2' AS business_2:chararray,
-                                           $0#'raw_distances::distance' AS distance:chararray,
+                                           (float)$0#'raw_distances::distance' AS distance:float,
                                            $0#'businesses::business_id' AS business_id:chararray,
                                            $0#'raw_distances::business_1' AS business_1:chararray,
                                            $0#'businesses::latitude' AS latitude:float,
@@ -36,7 +36,7 @@ nearest_businesses = FOREACH (GROUP with_coords BY business_1) {
     sorted = ORDER with_coords BY distance;
     top_10 = LIMIT sorted 10;
     GENERATE group AS business_id, 
-             (float)MAX(top_10.distance) AS range:float, 
+             (float)(2.0 * MAX(top_10.distance)) AS range:float, 
              top_10.(business_2, name, latitude, longitude) AS nearest_businesses;
 }
 STORE nearest_businesses INTO 'mongodb://localhost/yelp.nearest_businesses' USING MongoStorage();

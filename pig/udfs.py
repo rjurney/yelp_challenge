@@ -11,6 +11,7 @@ from nltk.corpus import treebank
 treebank_train = list(treebank.tagged_sents())
 training_data = brown_train + treebank_train
 
+# Setup braubt tagger
 from nltk.tag.sequential import RegexpTagger
 regexp_tagger = RegexpTagger(
      [(r'^-?[0-9]+(.[0-9]+)?$', 'CD'),   # cardinal numbers
@@ -42,6 +43,24 @@ trainer = FastBrillTaggerTrainer(initial_tagger=unigram_tagger_2,
                                   deterministic=True)
 brill_tagger = trainer.train(training_data, max_rules=10)
 
+# Setup lematizer
+from nltk.stem.wordnet import WordNetLemmatizer
+lmtzr = WordNetLemmatizer()
+
+# Setup spell check
+import enchant
+from nltk.metrics import edit_distance
+spell_dict = enchant.Dict('en')
+
+def check_replace_word(word):
+    if spell_dict.check(word):
+        return word
+    suggestions = spell_dict.suggest(word)
+    if suggestions and edit_distance(word, suggestions[0]) < 2:
+        return suggestions[0]
+    else:
+        return word
+
 @outputSchema("tokens:chararray")
 def adjectives(paragraph):
     adjectives = []
@@ -53,7 +72,12 @@ def adjectives(paragraph):
         for tag in tagged:
             # Adjectives, adverbs and nouns longer than 3 chars
             if ( tag[1].startswith('JJ') | tag[1].startswith('RB') | tag[1].startswith('NN') ) & (len(tag[0]) > 3):
-                adjectives.append(tag[0].lower())
+                # Spell check/correct
+                word = tag[0]
+                word = check_replace_word(word)
+                # lemmatize
+                lemd = lmtzr.lemmatize(word).lower()
+                adjectives.append(lemd)
     if adjectives:
         try:
             return " ".join(adjectives)
