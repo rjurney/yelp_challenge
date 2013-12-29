@@ -10,20 +10,14 @@ This repository contains experiments with the Yelp Data Challenge dataset. See [
 
 ## Booting the Web Application for Python Beginners
 
+```
 wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
-
 python ez_setup.py
-
 easy_install pip
-
 pip install --upgrade setuptools
-
 pip install virtualenv
-
 virtualenv -p `which python` env #Try sudo if this fails
-
 source env/bin/activate
-
 pip install -r requirements.txt
-
 python index.py
+```
