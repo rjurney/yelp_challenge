@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import pymongo
 import json
 import re
+import numpy as np
 
 # Setup Flask
 app = Flask(__name__)
@@ -32,22 +33,10 @@ def process_hours(hours_days):
         hour_chart_data[int(hour)]['value'] += hours_days[hour_day]
     return hour_chart_data
 
-def map_degree_to_zoom(degree_value):
-    # Determined by experimentation with Leaflet UI and MAX() of distances in Pig
-    range_min = 0
-    range_max = 142
-    zoom_min = 7
-    zoom_max = 12
-    
-    # Compute ranges
-    range_span = range_max - range_min
-    zoom_span = zoom_max - zoom_min
-    
-    # Convert the left range into a 0-1 range (float)
-    value_scaled = float(degree_value - range_min) / float(range_span)
-    
-    # Convert the 0-1 range into a value in the right range.
-    return int(zoom_max - (value_scaled * zoom_span))
+# Apply result of regression
+def map_km_to_zoom(km, a, b):
+    y = a*(-np.log(km)) + b
+    return y
     
 # [{'value': 0, 'label': '0'}, {'value': 0, 'label': '1'}
 def to_hours_array(records):
@@ -66,8 +55,7 @@ def business(business_id):
   hours_json = json.dumps([{'key': 'Checkins Per Hour', 'values': hours}])
   revs = reviews.find({'business_id': business_id}).sort('date', pymongo.DESCENDING)
   nearby = nearest_businesses.find_one({'business_id': business_id})
-  zoom_level = map_degree_to_zoom(nearby['range'])
-  zoom_level = 11
+  zoom_level = map_km_to_zoom(nearby['range'], 1.32809669067, 14.7211913904) # See data/regress_zoom_level.py
   words_per_business = db['ntf_idf_words_per_business'].find_one({'business_id': business_id})
   if words_per_business:
     words_per_business = json.dumps(words_per_business['ntf_idf_scores'])
@@ -75,8 +63,8 @@ def business(business_id):
   print "Zoom level: %s" % (zoom_level)
   return render_template('partials/business.html', business=business, 
                                                    hours_json=hours_json, 
-                                                   hours=hours, 
-                                                   revs=revs, 
+                                                   hours=hours,
+                                                   revs=revs,
                                                    nearby=nearby['nearest_businesses'], 
                                                    zoom_level=zoom_level,
                                                    words_per_business=words_per_business)

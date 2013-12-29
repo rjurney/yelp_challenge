@@ -121,9 +121,9 @@
               .text(function(d) { return d.text; });
         }
 
-        d3.layout.cloud().size([1200, 600])
+        d3.layout.cloud().size([700, 700])
             .words({{ words_per_business | safe }}.map(function(d) {
-              return {text: d['adjective'], size: 10 + d['score'] * 10000};
+              return {text: d['adjective'], size: 10 + d['score'] * 5000};
             }))
             .padding(2)
             .rotate(function() { return ~~(Math.random() * 2) * 90; })

@@ -17,7 +17,7 @@ x = np.array(x)
 y = np.array(y)
 
 plt.plot(x, y, 'ro',label="Original Data")
-np.corrcoef(x,y) #-0.59
+np.corrcoef(x,y) #-0.78
 
 def func(x, a, b):
     y = a*(-np.log(x)) + b

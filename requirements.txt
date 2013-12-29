@@ -1,0 +1,11 @@
+BareNecessities==0.2.8
+Flask==0.10.1
+Jinja2==2.7.1
+LEPL==5.1.3
+Mail==2.1.0
+MarkupSafe==0.18
+Werkzeug==0.9.4
+itsdangerous==0.23
+numpy==1.8.0
+pymongo==2.6.3
+wsgiref==0.1.2
